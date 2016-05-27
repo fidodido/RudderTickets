@@ -1,0 +1,164 @@
+{% extends "ticket/layout.html" %} {% block content %} {% load staticfiles i18n %} {% load humanize %} 
+
+<div class="card">
+
+    <span class="card-title">{{ ticket.name }} (#{{ ticket.id }})</span>
+
+    <div class="card-action">
+        <div class="pull-left">
+            {% for action in actions %}
+            <a data-toggle="tooltip" data-placement="bottom" title="{{ action.name }}" href="/tickets/view/{{ ticket.slug }}/action/{{ action.slug }}" class="btn btn-xs btn-default">
+                <span class="{{ action.icon }}"></span>
+                {{ action.name }}
+            </a>
+            {% endfor %}
+        </div>
+        <div class="pull-right">
+            <a data-toggle="tooltip" data-placement="bottom" title="Edit" href="/tickets/edit/{{ ticket.slug }}" class="btn btn-xs btn-default">
+                <span class="glyphicon glyphicon-pencil"></span>
+                Edit
+            </a>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="row">
+
+        {% if ticket.status.name == 'Resolved' %}
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Resolution by {{ ticket.assigned_to.username }}</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="commentList">
+                        <li>
+                            <div class="commenterImage">
+                              <img src="{% static "ticket/img/32/avatar.png" %}" />
+                            </div>
+                            <div class="commentText">
+                                <p class="">{{ ticket.resolution }}</p>
+                                <span class="date sub-text"></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Description</h3>
+                </div>
+                <div class="panel-body">
+                    {{ ticket.description }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Basic</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Status</th>
+                            <td><span class="label label-block label-{{ ticket.status.label_class }}">{{ ticket.status.name }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Priority</th>
+                            <td>
+                                {% if ticket.is_priority %} 
+                                <div class="icon-16-fire"></div>
+                                &nbsp;Hight Priority
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td>{{ ticket.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Project</th>
+                            <td>{{ ticket.project.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Assign To</th>
+                            <td>{{ ticket.assigned_to.username }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Comments</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="commentList">
+                        {% for comment in comments %}
+                        <li>
+                            {% if comment.user == active_user %}
+                            <div class="commenterAction">
+                              <a data-toggle="tooltip" data-placement="right" title="Delete" href="/tickets/view/{{ ticket.slug }}/delete-comment/{{ comment.id }}" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-remove"></span></a>
+                            </div>
+                            {% endif %}
+                            <div class="commenterImage">
+                              <img src="{% static "ticket/img/32/avatar.png" %}" />
+                            </div>
+                            <div class="commentText">
+                                <p class="">{{ comment.comment }}</p>
+                                <span class="date sub-text">Commented {{ comment.created|naturaltime }}</span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <form method="POST" action="/tickets/view/{{ ticket.slug }}/comment" class="form-horizontal" role="form">
+                        {% csrf_token %}
+                        {{ commentForm.user }}
+                        {{ commentForm.ticket }}
+                        <div class="form-group">
+                            {{ commentForm.comment }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Workflow</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-3"><strong>Estado</strong></div>
+                        <div class="col-md-3"><strong>Fecha del cambio</strong></div>
+                        <div class="col-md-3"><strong>Quien lo realizó</strong></div>
+                        <div class="col-md-3"><strong>Observación</strong></div>
+                    </div>
+                    {% for work in workflow %}
+                    <div class="row row-activity">
+                        <div class="col-md-3">
+                            {{ work.post_status.name }}
+                        </div>
+                        <div class="col-md-3">{{ work.modified|naturaltime }}</div>
+                        <div class="col-md-3">
+                            <span class="glyphicon glyphicon-user"></span>
+                            {{ work.user.username }}&nbsp;{{ work.user.last_name }}
+                        </div>
+                        <div class="col-md-3">{{ work.comment }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

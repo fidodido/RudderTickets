@@ -1,0 +1,36 @@
+{% extends "ticket/layout.html" %} {% block content %} {% load staticfiles i18n %}
+
+<form method="POST">
+<div class="card">
+    
+    <span class="card-title">{{ action.name }} {{ ticket.name }}</span>
+
+    <div class="card-content">
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {{ form.current_status }}
+            {{ form.post_status }}
+            {{ form.ticket }}
+            {{ form.user }}
+        
+            <div class="form-group">
+                <label for="inputEmail3" class="col-sm-2 control-label">Optional Comment</label>
+                <div class="col-sm-5">
+                    {{ form.comment }}
+                </div>
+                <span class="generic-error">{{ form.comment.errors.as_text }}</span>
+                <div class="clearfix"></div>
+            </div>
+                    
+        </form>
+    </div>
+
+    <div class="card-action">
+        <button class="btn btn-danger">CONFIRM CANCEL</button>
+        <a href="/tickets/view/{{ ticket.slug }}" class="btn btn-default">RETURN TO TICKET</a>
+    </div>
+</div>
+</form>
+{% endblock %}
