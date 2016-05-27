@@ -10,6 +10,7 @@
 
     {% block stylesheets %}
         <link rel="stylesheet" href="{% static "ticket/css/bootstrap.min.css" %}">
+        <link rel="stylesheet" href="{% static "ticket/css/todc-bootstrap.min.css" %}">
         <link rel="stylesheet" href="{% static "ticket/css/toastr.min.css" %}">
         <link rel="stylesheet" href="{% static "ticket/css/style.css" %}">
 
@@ -25,7 +26,7 @@
 </head>
 <body>
 
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+<div class="navbar navbar-masthead navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
             <a class="navbar-brand" href="{% url 'index' %}">{{ app_title }}</a>

@@ -7,14 +7,14 @@
     <div class="card-action">
         <div class="pull-left">
             {% for action in actions %}
-            <a data-toggle="tooltip" data-placement="bottom" title="{{ action.name }}" href="/tickets/view/{{ ticket.slug }}/action/{{ action.slug }}" class="btn btn-xs btn-default">
+            <a data-toggle="tooltip" data-placement="bottom" title="{{ action.name }}" href="/tickets/view/{{ ticket.slug }}/action/{{ action.slug }}" class="btn btn-md btn-default">
                 <span class="{{ action.icon }}"></span>
                 {{ action.name }}
             </a>
             {% endfor %}
         </div>
         <div class="pull-right">
-            <a data-toggle="tooltip" data-placement="bottom" title="Edit" href="/tickets/edit/{{ ticket.slug }}" class="btn btn-xs btn-default">
+            <a data-toggle="tooltip" data-placement="bottom" title="Edit" href="/tickets/edit/{{ ticket.slug }}" class="btn btn-md btn-default">
                 <span class="glyphicon glyphicon-pencil"></span>
                 Edit
             </a>
@@ -105,7 +105,7 @@
                         <li>
                             {% if comment.user == active_user %}
                             <div class="commenterAction">
-                              <a data-toggle="tooltip" data-placement="right" title="Delete" href="/tickets/view/{{ ticket.slug }}/delete-comment/{{ comment.id }}" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-remove"></span></a>
+                              <a data-toggle="tooltip" data-placement="left" title="Delete" href="/tickets/view/{{ ticket.slug }}/delete-comment/{{ comment.id }}" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-remove"></span></a>
                             </div>
                             {% endif %}
                             <div class="commenterImage">
