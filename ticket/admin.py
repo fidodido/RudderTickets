@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 # Register your models here.
-from app.models import Project, Type, Status, Ticket, UserDetail, Comment, Action, Workflow
+from ticket.models import Project, Type, Status, Ticket, UserDetail, Comment, Action, Workflow
 
 # Register your models here.
 # Register your models here.
