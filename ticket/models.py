@@ -41,11 +41,11 @@ class Ticket(models.Model):
 	updated = models.DateTimeField(auto_now=True)
 	status = models.ForeignKey(Status, default=1)
 	type = models.ForeignKey(Type)
-	project = models.ForeignKey(Project)
 	assigned_to = models.ForeignKey(User, null=True, related_name='assigned_to')
 	resolution = models.CharField(max_length=255, default='')
 	high_priority = models.BooleanField(default=0)
 	user_detail = models.ManyToManyField(User, through='UserDetail')
+	docfile = models.FileField(default='', upload_to='documents/%Y/%m/%d')
 
 	def is_priority(self):
 		return True if self.high_priority else False

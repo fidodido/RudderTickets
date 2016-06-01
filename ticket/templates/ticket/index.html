@@ -1,63 +1,24 @@
 {% extends "ticket/layout.html" %} {% block content %} {% load staticfiles i18n %} {% load humanize %}
 
-    <div class="page-header">
-        <h1>
-            Tickets
-        </h1>
-    </div><!-- /.page-header -->
-
-    <div class="row">
-        <div class="col-xs-12">
-
-        </div><!-- /.col -->
-    </div><!-- /.row -->
-
-
-    <form class="form-horizontal" role="form" method="post">
-        {% csrf_token %}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-content">
-                        <table id="simple-table" class="table  table-bordered table-hover">
-                            <thead>
-                            <tr>
-                                <th></th>
-                                <th>Name</th>
-                                <th>Type</th>
-                                <th>Status</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for ticket in tickets %}
-                                <tr>
-                                    <td>
-                                        <div style="float: left"><img src="{% static "ticket/img/32/avatar.png" %}">
-                                        </div>
-                                        <div>
-                                            {% if ticket.is_priority %}
-                                                <div class="icon-16-fire"></div>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <a class="ticket-link"
-                                           href="/tickets/view/{{ ticket.slug }}">{{ ticket.name }}</a>
-                                    </td>
-                                    <td>
-                                        {{ ticket.type.name }}
-                                    </td>
-                                    <td><span
-                                            class="label-block label label-{{ ticket.status.label_class }}">{{ ticket.status.name }}</span>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-
-                    </div>
-                </div>
-            </div>
+    <div class="tickets-container">
+        <div class="row ticket-row">
+            <div class="col-md-2"><strong>Status</strong></div>
+            <div class="col-md-4"><strong>Type</strong></div>
+            <div class="col-md-2"><strong>Status</strong></div>
+            <div class="col-md-2"><strong>Asignado a</strong></div>
+            <div class="col-md-2"><strong>Created</strong></div>
         </div>
-    </form>
+        {% for t in tickets %}
+            <div class="row ticket-row">
+                <div class="col-md-2"><span class="label-block label label-{{ t.status.label_class }}">{{ t.status.name }}</span></div>
+                <div class="col-md-4">
+                    <a href="/tickets/view/{{ t.slug }}/">TICKET-{{ t.id }}</a><br>
+                    {{ t.name }}
+                </div>
+                <div class="col-md-2">{{ t.type.name }}</div>
+                <div class="col-md-2">{{ t.created_by.username }}</div>
+                <div class="col-md-2">{{ t.created|naturaltime }}</div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

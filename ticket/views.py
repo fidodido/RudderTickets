@@ -4,6 +4,7 @@ from ticket.forms import TicketForm, AssignToForm, CancelForm, SolveForm, Commen
 from django.contrib import messages
 from ticket.models import Ticket, Action, Status, Workflow, Comment, UserDetail
 import pprint
+from django.http import HttpResponse
 
 PENDING = 1
 WORKING_IN = 2
@@ -84,6 +85,10 @@ def add(request):
 
     return render(request, template, {'form': form})
 
+@login_required
+def upload(request):
+
+    return HttpResponse('{"status": "ok"}')
 
 @login_required
 def edit(request, ticket_slug):

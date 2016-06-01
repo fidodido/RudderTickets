@@ -29,6 +29,11 @@ urlpatterns = [
 		name='tickets_add'
 	),
 
+	url(r'^upload/$',
+		views.upload,
+		name='tickets_upload'
+	),
+
 	url(r'^edit/(?P<ticket_slug>[a-zA-Z0-9-]+)/',
 		views.edit,
 		name='tickets_edit'
