@@ -10,6 +10,26 @@ h1,h2,h3,h4,h5,h6 {
     margin-bottom: 3px;
 }
 
+.tag-list {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.tag-list li {
+    display: inline-block;
+}
+
+.tag-list > li > a {
+    text-decoration: none;
+    color: #39739d;
+    background-color: #E1ECF4;
+    border: solid 1px;
+    border-color: transparent;
+    padding: .4em .5em;
+}
+
+
 .list-attachment {
     list-style-type: none;
     margin: 0px;
@@ -18,6 +38,7 @@ h1,h2,h3,h4,h5,h6 {
 
 
 .panel-comment {
+    color: #333;
     font-size: 14px;
     border: 0px;
     box-shadow: none;

@@ -3,63 +3,46 @@
 <form class="form-horizontal" role="form" method="post">
     {% csrf_token %}
 
-    <div class="card">
 
-        <div class="card-heading">
-            <span class="card-title">Create New Ticket</span>
+    <h3>Create New Ticket</h3>
+    <hr>
+
+    <div class="form-group">
+        <label for="inputEmail3" class="col-sm-2 control-label">Service Type</label>
+        <div class="col-sm-5">
+            {{ form.type }}
         </div>
-
-        <div class="card-content">
-
-            <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">Service Type</label>
-                <div class="col-sm-5">
-                    {{ form.type }}
-                </div>
-            </div>
-
-            <hr>
-
-            <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">Summary</label>
-                <div class="col-sm-10">
-                    {{ form.name }}
-                </div>
-                <span class="generic-error">{{ form.name.errors.as_text }}</span>
-            </div>
-
-            <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">High Priority</label>
-                <div class="col-sm-10">
-                    {{ form.high_priority }}
-                </div>
-                <span class="generic-error">{{ form.high_priority.errors.as_text }}</span>
-            </div>
-
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
-                <div class="col-sm-10">
-                    {{ form.description }}
-                </div>
-            </div>
-
-            <span>Optional</span>
-            
-            <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">Project</label>
-                <div class="col-sm-5">
-                    {{ form.project }}
-                </div>
-            </div>
-
-        </div>
-
-        <div class="card-action">
-            <button class="btn btn-primary">CREATE</button>
-            <a href="/tickets/" class="btn btn-default">CANCEL</a>
-        </div>
-    
     </div>
+
+    <div class="form-group">
+        <label for="inputEmail3" class="col-sm-2 control-label">Summary</label>
+        <div class="col-sm-10">
+            {{ form.name }}
+        </div>
+        <span class="generic-error">{{ form.name.errors.as_text }}</span>
+    </div>
+
+    <div class="form-group">
+        <label for="inputEmail3" class="col-sm-2 control-label">High Priority</label>
+        <div class="col-sm-10">
+            {{ form.high_priority }}
+        </div>
+        <span class="generic-error">{{ form.high_priority.errors.as_text }}</span>
+    </div>
+
+    <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
+        <div class="col-sm-10">
+            {{ form.description }}
+        </div>
+    </div>
+
+
+    <div class="card-action">
+        <button class="btn btn-primary">CREATE</button>
+        <a href="/tickets/" class="btn btn-default">CANCEL</a>
+    </div>
+    
 
 </form>
 {% endblock %}

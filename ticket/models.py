@@ -17,6 +17,8 @@ class Project(models.Model):
 
 class Type(models.Model):
 	name = models.CharField(max_length=255, unique=True)
+	icon = models.CharField(default='', max_length=255)
+	color = models.CharField(default='', max_length=255)
 
 	def __unicode__(self):
 		return self.name
