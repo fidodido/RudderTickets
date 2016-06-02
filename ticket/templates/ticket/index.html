@@ -16,7 +16,7 @@
                     {{ t.name }}
                 </div>
                 <div class="col-md-2">{{ t.type.name }}</div>
-                <div class="col-md-2">{{ t.created_by.username }}</div>
+                <div class="col-md-2">{{ t.created_by.first_name }} {{ t.created_by.last_name }}</div>
                 <div class="col-md-2">{{ t.created|naturaltime }}</div>
             </div>
         {% endfor %}
