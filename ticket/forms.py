@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from ticket.models import Project, Ticket, Workflow, Comment
+from ticket.models import Project, Ticket, Workflow, Reply
 from django.utils.text import slugify
 
 
@@ -74,9 +74,9 @@ class SolveForm(forms.ModelForm):
             'user': forms.HiddenInput()
         }
 
-class CommentForm(forms.ModelForm):
+class ReplyForm(forms.ModelForm):
     class Meta:
-        model = Comment
+        model = Reply
         fields = ['comment', 'ticket', 'user']
         widgets = {
             'comment': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Comment ...'}),

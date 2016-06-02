@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, permission_required
-from ticket.forms import TicketForm, AssignToForm, CancelForm, SolveForm, CommentForm, ReopenForm
+from ticket.forms import TicketForm, AssignToForm, CancelForm, SolveForm, ReplyForm, ReopenForm
 from django.contrib import messages
-from ticket.models import Ticket, Action, Status, Workflow, Comment, UserDetail
+from ticket.models import Ticket, Action, Status, Workflow, Reply, UserDetail, Attachment
 import pprint
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+import os
 
 PENDING = 1
 WORKING_IN = 2
@@ -46,7 +47,7 @@ def view(request, ticket_slug):
     ticket = Ticket.objects.get(slug=ticket_slug)
     actions = Action.objects.filter(current_status=ticket.status)
     workflow = Workflow.objects.filter(ticket=ticket)
-    comments = Comment.objects.filter(ticket=ticket).order_by('-created')
+    replies = Reply.objects.filter(ticket=ticket).order_by('created')
     
     user_detail = UserDetail.objects.filter(ticket=ticket, user=request.user)
 
@@ -57,13 +58,13 @@ def view(request, ticket_slug):
         new_detail.viewed = True
         new_detail.save()
 
-    commentForm = CommentForm(initial={
+    replyForm = ReplyForm(initial={
         'user': request.user,
         'ticket': ticket
     })
 
     template = 'ticket/view.html'
-    return render(request, template, {'ticket': ticket, 'comments': comments, 'actions': actions, 'workflow': workflow, 'commentForm': commentForm})
+    return render(request, template, {'ticket': ticket, 'replies': replies, 'actions': actions, 'workflow': workflow, 'replyForm': replyForm})
 
 
 @login_required
@@ -77,7 +78,16 @@ def add(request):
         form = TicketForm(request.POST)
 
         if form.is_valid():
+            
             new_ticket = form.save()
+
+            # ademas se debe crear una reply.
+            reply = Reply()
+            reply.user = request.user
+            reply.ticket = new_ticket
+            reply.comment = request.POST.get('description')
+            reply.save()
+
             messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
             return redirect('tickets_index')
         else:
@@ -85,10 +95,77 @@ def add(request):
 
     return render(request, template, {'form': form})
 
+
 @login_required
 def upload(request):
+    """
+    Sube un archivo al servidor
+    """
 
-    return HttpResponse('{"status": "ok"}')
+    from time import time
+
+    # por ahora, los archivos quedaran en el directorio temporal dentro del proyecto.
+    upload_file = request.FILES['file']
+
+    # creamos un nombre unico para guardar en el disco.
+    unique_name = hex(int(time()*10000000))[2:]
+
+    # especificamos el path
+    path = 'temp/' + unique_name
+
+    # Escribimos en el servidor.
+    with open(path, 'wb+') as destination:
+        for chunk in upload_file.chunks():
+            destination.write(chunk)
+
+    return JsonResponse({'status':'success', 'hash': unique_name, 'name': upload_file.name})
+
+
+@login_required
+def download(request, hash):
+
+    from django.utils.encoding import smart_str
+    from wsgiref.util import FileWrapper
+    attachment = Attachment.objects.get(hash=hash)
+
+    filename = "temp/" + attachment.hash
+    wrapper = FileWrapper(file(filename))
+    response = HttpResponse(wrapper, content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(attachment.name)
+    response['Content-Length'] = os.path.getsize(filename)
+    return response
+
+
+@login_required
+def comment(request, ticket_slug):
+
+    if request.method == 'POST':
+
+        form = ReplyForm(request.POST)
+
+        if form.is_valid():
+
+            new_reply = form.save()
+
+            print request.POST.getlist('filename')
+
+            filenames = request.POST.getlist('filename')
+            filehashes = request.POST.getlist('filehash')
+
+            print filehashes
+
+            i = 0
+            for myfile in filenames:
+                attachment = Attachment()
+                attachment.reply = new_reply
+                attachment.name = myfile
+                attachment.hash = filehashes[i]
+                attachment.save()
+                i = i + 1
+
+            messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
+            return redirect('tickets_view', new_reply.ticket.slug)
+
 
 @login_required
 def edit(request, ticket_slug):
@@ -227,18 +304,6 @@ def solve(request, ticket_slug):
     
     return render(request, template, {'form': form, 'action': action, 'ticket': ticket})
 
-
-@login_required
-def comment(request, ticket_slug):
-
-    if request.method == 'POST':
-
-        form = CommentForm(request.POST)
-
-        if form.is_valid():
-            new_comment = form.save()
-            messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
-            return redirect('tickets_view', new_comment.ticket.slug)
 
 
 @login_required

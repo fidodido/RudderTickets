@@ -15,14 +15,15 @@
     },
     
     addFile: function(id, i, file){
-		var template = '<div id="demo-file' + i + '">' +
+		var template = '<div class="file-line" id="demo-file' + i + '">' +
 							'<div class="row">' +
-								'<div class="col-md-7">' +
+								'<div class="col-md-9">' +
 									'<span>' + file.name + '</span>' +
+									'<span style="color: #82FA58; font-weight: bolder;" class="tick"></span>' +
 								'</div>' +
-								'<div class="col-md-5">' +
-									'<div class="progress progress-striped active">'+
-				                       '<div class="progress-bar" role="progressbar" style="width: 0%;">'+
+								'<div class="col-md-3">' +
+									'<div class="progress">'+
+				                       '<div class="progress-bar progress-bar-primary" role="progressbar" style="width: 0%;">'+
 				                           '<span class="sr-only">0% Complete</span>'+
 				                       '</div>' +
 			                       '</div>' +
@@ -51,6 +52,8 @@
 	updateFileProgress: function(i, percent){
 		$('#demo-file' + i).find('div.progress-bar').width(percent);
 		$('#demo-file' + i).find('span.sr-only').html(percent + ' Complete');
+
+		console.log(percent);
 	},
 	
 	humanizeSize: function(size) {

@@ -16,24 +16,12 @@
         </div>
 
         <div class="row">
-            <div class="col-md-8">
-                <div class="panel panel-primary">
-                    <div class="panel-heading"><h3 class="panel-title">{{ ticket.created_by.username }} says:</h3></div>
-                    <div class="panel-body">
-                        <div class="media">
-                            <div class="media-left">
-                                <a href="#">
-                                    <img class="media-object" data-src="holder.js/64x64" alt="64x64" src="{% static "ticket/avatars/avatar4.png" %}" data-holder-rendered="true" style="width: 48px; height: 48px;">
-                                </a>
-                            </div>
-                            <div class="media-body">{{ ticket.description }}</div>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-md-9">
                 <div class="comments-container">
-                    {% for c in comments %}
-                    <div class="panel panel-default">
-                        <div class="panel-heading"><h3 class="panel-title">{{ c.user.username }} says {{ c.created|naturaltime }}</h3></div>
+                    {% for reply in replies %}
+                    <div class="panel panel-comment panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">{{ reply.user.username }} (joseibieta@gmail.com) says {{ reply.created|naturaltime }}</h3></div>
                         <div class="panel-body">
                             <div class="media">
                                 <div class="media-left">
@@ -41,20 +29,30 @@
                                         <img class="media-object" data-src="holder.js/64x64" alt="64x64" src="{% static "ticket/avatars/avatar4.png" %}" data-holder-rendered="true" style="width: 48px; height: 48px;">
                                     </a>
                                 </div>
-                                <div class="media-body">{{ c.comment }}</div>
+                                <div class="media-body">{{ reply.comment|safe }}</div>
                             </div>
                         </div>
+                        {% if reply.attachment_set.all %}
+                            <div class="panel-footer">
+                                <ul class="list-attachment">
+                                {% for att in reply.attachment_set.all %}
+                                    <li><a href="/tickets/download/{{ att.hash }}/">{{ att.name }}</a></li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
-                <hr>
                 <div class="container-reply">
 
                     <form method="POST" action="/tickets/view/{{ ticket.slug }}/comment">
 
                         {% csrf_token %}
-                        {{ commentForm.ticket }}
-                        {{ commentForm.user }}
+                        {{ replyForm.ticket }}
+                        {{ replyForm.user }}
+
+                        <div id="hidden-files"></div>
 
                         <div class="panel panel-default">
 
@@ -62,9 +60,11 @@
                                 <textarea name="comment" class="summernote"></textarea>
                             </div>
 
-                            <div class="panel-footer">
-
+                            <div class="">
                                 <div class="panel-body demo-panel-files" id='demo-files'></div>
+                            </div>
+
+                            <div class="panel-footer">
 
                                 <div class="clearfix">
 
@@ -74,7 +74,7 @@
                                         <div class="browser">
                                             <label class="btn btn-default">
                                                 <span>ADD FILE</span>
-                                                <input type="file" name="files[]" multiple="multiple" title='Click to add Files'>
+                                                <input id="my-files" type="file" name="files[]" multiple="multiple" title='Click to add Files'>
                                             </label>
                                         </div>
                                     </div>
@@ -87,7 +87,7 @@
                     </form>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <table class="table table-condensed">
                     <tr>
                         <th>Status</th>
@@ -133,35 +133,81 @@ $(document).ready(function() {
         allowedTypes: 'image/*',
         /*extFilter: 'jpg;png;gif',*/
         onInit: function(){
-            console.log('#demo-debug', 'default', 'Plugin initialized correctly');
         },
         onBeforeUpload: function(id){
         },
-        onNewFile: function(id, file){
-            $.danidemo.addFile('#demo-files', id, file);
+        onNewFile: function(i, file){
+
+            var id = '#demo-files';
+
+            var template = '<div class="file-line" id="demo-file' + i + '">' +
+                                '<div class="row">' +
+                                    '<div class="col-md-9">' +
+                                        '<span>' + file.name + '</span>' +
+                                        '<span style="color: #82FA58; font-weight: bolder;" class="tick"></span>' +
+                                    '</div>' +
+                                    '<div class="col-md-3">' +
+                                        '<div class="progress">'+
+                                           '<div class="progress-bar progress-bar-primary" role="progressbar" style="width: 0%;">'+
+                                               '<span class="sr-only">0% Complete</span>'+
+                                           '</div>' +
+                                       '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                           '</div>';
+                           
+            var i = $(id).attr('file-counter');
+            if (!i){
+                $(id).empty();
+                
+                i = 0;
+            }
+            
+            i++;
+            
+            $(id).attr('file-counter', i);
+            
+            $(id).prepend(template);
         },
-        onComplete: function(){
-            console.log('on complete');
-            console.log($(this));
+        onComplete: function(id, file){
         },
-        onUploadProgress: function(id, percent){
-          var percentStr = percent + '%';
-          $.danidemo.updateFileProgress(id, percentStr);
+        onUploadProgress: function(i, percent){
+
+            var percentStr = percent + '%';
+
+            $('#demo-file' + i).find('div.progress-bar').width(percentStr);
+            $('#demo-file' + i).find('span.sr-only').html(percentStr + ' Complete');
+
         },
         onUploadSuccess: function(id, data){
-            console.log(this);
+
+            // Insertamos un flag de exito.
+            var span = $("#demo-file" + id).find('.tick').html(' (<i style="color: #82FA58;" class="fa fa-check" aria-hidden="true"></i>)');
+
+            // Agregamos un input hidden al form de la respuesta.
+            var fileHiddenInputName = document.createElement('input');
+            fileHiddenInputName.type = 'hidden';
+            fileHiddenInputName.name = 'filename';
+            fileHiddenInputName.value = data.name;
+
+            // Agregamos un input hidden al form de la respuesta.
+            var fileHiddenInputHash = document.createElement('input');
+            fileHiddenInputHash.type = 'hidden';
+            fileHiddenInputHash.name = 'filehash';
+            fileHiddenInputHash.value = data.hash;
+
+            $("#hidden-files").append(fileHiddenInputName);
+            $("#hidden-files").append(fileHiddenInputHash);
+
         },
-        onUploadError: function(id, message){
-          $.danidemo.updateFileStatus(id, 'error', message);
+        onUploadError: function(i, message){
+            $('#demo-file' + i).find('span.demo-file-status').html(message).addClass('demo-file-status-error');
         },
         onFileTypeError: function(file){
-          console.log('#demo-debug', 'error', 'File \'' + file.name + '\' cannot be added: must be an image');
         },
         onFileSizeError: function(file){
-          console.log('#demo-debug', 'error', 'File \'' + file.name + '\' cannot be added: size excess limit');
         },
         onFallbackMode: function(message){
-          console.log('#demo-debug', 'info', 'Browser not supported(do something else here!): ' + message);
         }
       });
 

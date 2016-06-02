@@ -10,6 +10,50 @@ h1,h2,h3,h4,h5,h6 {
     margin-bottom: 3px;
 }
 
+.list-attachment {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+
+.panel-comment {
+    font-size: 14px;
+    border: 0px;
+    box-shadow: none;
+    border-bottom: solid 1px #e7e7e7;
+}
+
+.panel-comment > .panel-heading {
+    background-color: #fff;
+    border: 0px;
+}
+
+.panel-comment > .panel-footer {
+    background-color: #fff;
+    border: 0px;
+    border-top: solid 1px #e7e7e7;
+}
+
+.panel-comment > .panel-heading > .panel-title {
+    font-size: 14px;
+}
+
+.progress {
+    margin-bottom: 3px;
+    font-style: italic;
+}
+
+.file-line {
+    margin-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.demo-panel-files {
+    padding: 0px;
+}
+
 .label {
     border-radius: 0px;
     font-size: 100%;

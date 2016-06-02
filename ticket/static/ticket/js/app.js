@@ -67,7 +67,6 @@ $(document).ready(function () {
     });
 
     $('.new-ticket').summernote({
-        placeholder: 'Im writing a new ticket ...'
     });
 
 

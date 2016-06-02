@@ -34,6 +34,11 @@ urlpatterns = [
 		name='tickets_upload'
 	),
 
+	url(r'^download/(?P<hash>[a-zA-Z0-9-]+)/$',
+		views.download,
+		name='tickets_download'
+	),
+
 	url(r'^edit/(?P<ticket_slug>[a-zA-Z0-9-]+)/',
 		views.edit,
 		name='tickets_edit'

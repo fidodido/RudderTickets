@@ -45,27 +45,38 @@ class Ticket(models.Model):
 	resolution = models.CharField(max_length=255, default='')
 	high_priority = models.BooleanField(default=0)
 	user_detail = models.ManyToManyField(User, through='UserDetail')
-	docfile = models.FileField(default='', upload_to='documents/%Y/%m/%d')
 
 	def is_priority(self):
 		return True if self.high_priority else False
+
+
+# Un ticket tiene muchas respuestas como un blog/post
+class Reply(models.Model):
+
+	comment = models.CharField(max_length=255)
+	ticket = models.ForeignKey(Ticket)
+	user = models.ForeignKey(User)
+	created = models.DateTimeField(auto_now_add=True)
+
+	def __unicode__(self):
+		return self.name
+
+
+class Attachment(models.Model):
+	
+	name = models.CharField(max_length=255)
+	hash = models.CharField(default='', max_length=255)
+	reply = models.ForeignKey(Reply)
+
+	def __unicode__(self):
+		return self.name
+		
 
 class UserDetail(models.Model):
 
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
 	viewed = models.BooleanField(default=0)
-
-	def __unicode__(self):
-		return self.name
-
-
-class Comment(models.Model):
-
-	comment = models.CharField(max_length=255)
-	ticket = models.ForeignKey(Ticket)
-	user = models.ForeignKey(User)
-	created = models.DateTimeField(auto_now_add=True)
 
 	def __unicode__(self):
 		return self.name
