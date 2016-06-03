@@ -23,31 +23,35 @@
 
                 <h4>{{ ticket.name }} (<i style="color: {{ ticket.type.color }}" class="{{ ticket.type.icon }}" aria-hidden="true"></i> {{ ticket.type.name }})</h4>
                 <hr>
+
                 <div class="comments-container">
                     {% for reply in replies %}
-                    <div class="panel panel-comment panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title"><strong>{{ reply.user.first_name }} {{ reply.user.last_name }}</strong>&nbsp;&#171;joseibieta@gmail.com&#187;<span class="pull-right"><i class="fa fa-clock-o" aria-hidden="true"></i>&nbsp;{{ reply.created|naturaltime }}</span></h3></div>
-                        <div class="panel-body">
-                            <div class="media">
-                                <div class="media-left">
-                                    <a href="#">
-                                        <img class="media-object" data-src="holder.js/64x64" alt="64x64" src="{% static "ticket/avatars/avatar4.png" %}" data-holder-rendered="true" style="width: 48px; height: 48px;">
-                                    </a>
+                    <div class="row">
+                        <div class="col-md-1">
+                            <img class="media-object" data-src="holder.js/64x64" alt="64x64" src="{% static "ticket/avatars/avatar4.png" %}" data-holder-rendered="true" style="width: 32px; height: 32px;">
+                        </div>
+                        <div class="col-md-11">
+                            <div class="panel panel-comment panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title"><strong>{{ reply.user.first_name }} {{ reply.user.last_name }}</strong>&nbsp;&#171;joseibieta@gmail.com&#187;<span class="pull-right"><i class="fa fa-clock-o" aria-hidden="true"></i>&nbsp;{{ reply.created|naturaltime }}</span></h3></div>
+                                <div class="panel-body">
+                                    <div class="media">
+                                        <div class="media-body">{{ reply.comment|safe }}</div>
+                                    </div>
                                 </div>
-                                <div class="media-body">{{ reply.comment|safe }}</div>
+                                {% if reply.attachment_set.all %}
+                                    <div class="panel-footer">
+                                        <ul class="list-attachment">
+                                        {% for att in reply.attachment_set.all %}
+                                            <li><a href="/tickets/download/{{ att.hash }}/">{{ att.name }}</a></li>
+                                        {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
-                        {% if reply.attachment_set.all %}
-                            <div class="panel-footer">
-                                <ul class="list-attachment">
-                                {% for att in reply.attachment_set.all %}
-                                    <li><a href="/tickets/download/{{ att.hash }}/">{{ att.name }}</a></li>
-                                {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
                     </div>
+
                     {% endfor %}
 
                     {% if ticket.resolution %}
