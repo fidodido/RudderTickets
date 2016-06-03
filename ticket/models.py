@@ -44,7 +44,6 @@ class Ticket(models.Model):
 	status = models.ForeignKey(Status, default=1)
 	type = models.ForeignKey(Type)
 	assigned_to = models.ForeignKey(User, null=True, related_name='assigned_to')
-	resolution = models.CharField(max_length=255, default='')
 	high_priority = models.BooleanField(default=0)
 	user_detail = models.ManyToManyField(User, through='UserDetail')
 
@@ -95,7 +94,6 @@ class Action(models.Model):
 
 	def __unicode__(self):
 		return self.name
-
 
 
 class Workflow(models.Model):

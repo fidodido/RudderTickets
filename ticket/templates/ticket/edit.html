@@ -1,65 +1,146 @@
 {% extends "ticket/layout.html" %} {% block content %} {% load staticfiles i18n %}
 {% load staticfiles i18n %}
+
+<script src="{% static "ticket/js/summernote.min.js" %}" type="text/javascript"></script>
+<link rel="stylesheet" href="{% static "ticket/css/summernote.css" %}">
+
 <form class="form-horizontal" role="form" method="post">
-    {% csrf_token %}
 
-    <div class="card">
-
-        <div class="card-heading">
-            <span class="card-title">Edit Ticket</span>
+    <div class="action-bar clearfix">
+        <div class="pull-left">
+            <a href="/tickets/" class="btn btn-default"><i class="fa fa-chevron-left" aria-hidden="true"></i> Back</a>
         </div>
-
-        <div class="card-content">
-
-            <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">Service Type</label>
-                <div class="col-sm-5">
-                    {{ form.type }}
-                </div>
-            </div>
-
-            <hr>
-
-            <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">Summary</label>
-                <div class="col-sm-10">
-                    {{ form.name }}
-                </div>
-                <span class="generic-error">{{ form.name.errors.as_text }}</span>
-            </div>
-
-            <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">High Priority</label>
-                <div class="col-sm-10">
-                    {{ form.high_priority }}
-                </div>
-                <span class="generic-error">{{ form.high_priority.errors.as_text }}</span>
-            </div>
-
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
-                <div class="col-sm-10">
-                    {{ form.description }}
-                </div>
-            </div>
-
-            <span>Optional</span>
-            
-            <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">Project</label>
-                <div class="col-sm-5">
-                    {{ form.project }}
-                </div>
-            </div>
-
-        </div>
-
-        <div class="card-action">
-            <button class="btn btn-primary">CREATE</button>
-            <a href="/tickets/view/{{ ticket.slug }}" class="btn btn-default">CANCEL</a>
-        </div>
-    
     </div>
 
+    {% csrf_token %}
+
+    <h3>Edit Ticket #{{ ticket.id }}</h3>
+    <h5>{{ ticket.name }}</h5>
+    <hr>
+
+    <div class="form-group">
+        <label for="inputEmail3" class="col-sm-2 control-label">Service Type</label>
+        <div class="col-sm-5">
+            {{ form.type }}
+        </div>
+    </div>
+
+    <div class="form-group" style="display: none">
+        <label for="inputEmail3" class="col-sm-2 control-label">Summary</label>
+        <div class="col-sm-10">
+            {{ form.name }}
+        </div>
+        <span class="generic-error">{{ form.name.errors.as_text }}</span>
+    </div>
+
+    <div class="form-group">
+        <label for="inputEmail3" class="col-sm-2 control-label">High Priority</label>
+        <div class="col-sm-10">
+            {{ form.high_priority }}
+        </div>
+        <span class="generic-error">{{ form.high_priority.errors.as_text }}</span>
+    </div>
+
+    <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
+        <div class="col-sm-10">
+            {{ form.description }}
+        </div>
+    </div>
+
+    <button class="btn btn-primary">CREATE</button>
+
+
 </form>
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        $('.new-ticket').summernote({
+            height: 100
+        });
+
+    var plugin = $('#drag-and-drop-zone').dmUploader({
+        url: '/tickets/upload/',
+        dataType: 'json',
+        allowedTypes: 'image/*',
+        /*extFilter: 'jpg;png;gif',*/
+        onInit: function(){
+        },
+        onBeforeUpload: function(id){
+        },
+        onNewFile: function(i, file){
+
+            var id = '#demo-files';
+
+            var template = '<div class="file-line" id="demo-file' + i + '">' +
+                                '<div class="row">' +
+                                    '<div class="col-md-9">' +
+                                        '<span>' + file.name + '</span>' +
+                                        '<span style="color: #82FA58; font-weight: bolder;" class="tick"></span>' +
+                                    '</div>' +
+                                    '<div class="col-md-3">' +
+                                        '<div class="progress">'+
+                                           '<div class="progress-bar progress-bar-primary" role="progressbar" style="width: 0%;">'+
+                                               '<span class="sr-only">0% Complete</span>'+
+                                           '</div>' +
+                                       '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                           '</div>';
+                           
+            var i = $(id).attr('file-counter');
+            if (!i){
+                $(id).empty();
+                
+                i = 0;
+            }
+            
+            i++;
+            
+            $(id).attr('file-counter', i);
+            
+            $(id).prepend(template);
+        },
+        onComplete: function(id, file){
+        },
+        onUploadProgress: function(i, percent){
+
+            var percentStr = percent + '%';
+
+            $('#demo-file' + i).find('div.progress-bar').width(percentStr);
+            $('#demo-file' + i).find('span.sr-only').html(percentStr + ' Complete');
+
+        },
+        onUploadSuccess: function(id, data){
+
+            // Insertamos un flag de exito.
+            var span = $("#demo-file" + id).find('.tick').html(' (<i style="color: #82FA58;" class="fa fa-check" aria-hidden="true"></i>)');
+
+            // Agregamos un input hidden al form de la respuesta.
+            var fileHiddenInputName = document.createElement('input');
+            fileHiddenInputName.type = 'hidden';
+            fileHiddenInputName.name = 'filename';
+            fileHiddenInputName.value = data.name;
+
+            // Agregamos un input hidden al form de la respuesta.
+            var fileHiddenInputHash = document.createElement('input');
+            fileHiddenInputHash.type = 'hidden';
+            fileHiddenInputHash.name = 'filehash';
+            fileHiddenInputHash.value = data.hash;
+
+            $("#hidden-files").append(fileHiddenInputName);
+            $("#hidden-files").append(fileHiddenInputHash);
+        },
+        onUploadError: function(i, message){
+            $('#demo-file' + i).find('span.demo-file-status').html(message).addClass('demo-file-status-error');
+        },
+        onFileTypeError: function(file){
+        },
+        onFileSizeError: function(file){
+        },
+        onFallbackMode: function(message){
+        }
+      });
+    });
+</script>
 {% endblock %}
