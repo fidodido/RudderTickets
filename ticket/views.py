@@ -225,6 +225,14 @@ def assign_to(request, ticket_slug):
             ticket.status = new_workflow.post_status
             ticket.assigned_to = new_workflow.user
             ticket.save()
+
+            #new reply
+            reply = Reply()
+            reply.user = request.user
+            reply.ticket = ticket
+            reply.comment = '<span style="color: orange; font-weight: bolder;">The ticket has been re-assigned to: ' + new_workflow.user.username + '.</span><br>' + request.POST.get('comment')
+            reply.save()
+
             messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
             return redirect('tickets_view', ticket.slug)
     
