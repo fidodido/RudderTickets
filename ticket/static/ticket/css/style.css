@@ -10,6 +10,14 @@ h1,h2,h3,h4,h5,h6 {
     margin-bottom: 3px;
 }
 
+.navbar-brand {
+    background-image: url('../img/16/logo.png');
+    background-repeat: no-repeat;
+    background-position: 10px 16px;
+    text-indent: 5px;
+    padding-left: 30px;
+}
+
 .alert-resolution {
     background-color: #fff;
     border: solid 3px green;

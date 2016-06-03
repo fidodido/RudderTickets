@@ -234,13 +234,38 @@ def assign_to(request, ticket_slug):
 @login_required
 def cancel(request, ticket_slug):
 
-    #template = 'ticket/cancel.html'
+    template = 'ticket/cancel.html'
     ticket = Ticket.objects.get(slug=ticket_slug)
     action = Action.objects.get(current_status=ticket.status, post_status=CANCELED)
-    ticket.status = action.post_status
-    ticket.save()
-    messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
-    return redirect('tickets_view', ticket.slug)
+
+    form = CancelForm(initial={
+        'ticket': ticket,
+        'current_status': ticket.status,
+        'post_status': action.post_status,
+        'user': request.user
+    })
+
+    if request.method == 'POST':
+
+        form = CancelForm(request.POST)
+
+        if form.is_valid():
+            new_workflow = form.save()
+            ticket.status = new_workflow.post_status
+            ticket.assigned_to = new_workflow.user
+            ticket.save()
+
+            #new reply
+            reply = Reply()
+            reply.user = request.user
+            reply.ticket = ticket
+            reply.comment = '<span style="color: red; font-weight: bolder;">The ticket has been canceled.</span><br>' + request.POST.get('comment')
+            reply.save()
+
+            messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
+            return redirect('tickets_view', ticket.slug)
+    
+    return render(request, template, {'form': form, 'action': action, 'ticket': ticket})
 
 
 @login_required
@@ -249,10 +274,35 @@ def re_open(request, ticket_slug):
     template = 'ticket/re-open.html'
     ticket = Ticket.objects.get(slug=ticket_slug)
     action = Action.objects.get(current_status=ticket.status, post_status=PENDING)
-    ticket.status = action.post_status
-    ticket.save()
-    messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
-    return redirect('tickets_view', ticket.slug)
+
+    form = ReopenForm(initial={
+        'ticket': ticket,
+        'current_status': ticket.status,
+        'post_status': action.post_status,
+        'user': request.user
+    })
+
+    if request.method == 'POST':
+
+        form = ReopenForm(request.POST)
+
+        if form.is_valid():
+            new_workflow = form.save()
+            ticket.status = new_workflow.post_status
+            ticket.assigned_to = new_workflow.user
+            ticket.save()
+
+            #new reply
+            reply = Reply()
+            reply.user = request.user
+            reply.ticket = ticket
+            reply.comment = '<span style="color: orange; font-weight: bolder;">The ticket has been re-opened.</span><br>' + request.POST.get('comment')
+            reply.save()
+
+            messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
+            return redirect('tickets_view', ticket.slug)
+    
+    return render(request, template, {'form': form, 'action': action, 'ticket': ticket})
 
 
 @login_required
@@ -261,10 +311,37 @@ def solve(request, ticket_slug):
     template = 'ticket/solve.html'
     ticket = Ticket.objects.get(slug=ticket_slug)
     action = Action.objects.get(current_status=ticket.status, post_status=RESOLVED)
-    ticket.status = action.post_status
-    ticket.save()
-    messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
-    return redirect('tickets_view', ticket.slug)
+
+    form = SolveForm(initial={
+        'ticket': ticket,
+        'current_status': ticket.status,
+        'post_status': action.post_status,
+        'user': request.user
+    })
+
+    if request.method == 'POST':
+
+        form = SolveForm(request.POST)
+
+        if form.is_valid():
+            new_workflow = form.save()
+            ticket.status = new_workflow.post_status
+            ticket.assigned_to = new_workflow.user
+            ticket.resolution = request.POST.get('comment')
+            ticket.save()
+
+            #new reply
+            reply = Reply()
+            reply.user = request.user
+            reply.ticket = ticket
+            reply.comment = '<span style="color: green; font-weight: bolder;">The ticket has been resolved.</span><br>' + request.POST.get('comment')
+
+            reply.save()
+
+            messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
+            return redirect('tickets_view', ticket.slug)
+    
+    return render(request, template, {'form': form, 'action': action, 'ticket': ticket})
 
 
 @login_required

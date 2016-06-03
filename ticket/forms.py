@@ -74,6 +74,7 @@ class SolveForm(forms.ModelForm):
             'user': forms.HiddenInput()
         }
 
+
 class ReplyForm(forms.ModelForm):
     class Meta:
         model = Reply
