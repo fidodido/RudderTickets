@@ -10,6 +10,11 @@ h1,h2,h3,h4,h5,h6 {
     margin-bottom: 3px;
 }
 
+.alert-resolution {
+    background-color: #fff;
+    border: solid 3px green;
+}
+
 .tag-list {
     list-style-type: none;
     margin: 0px;

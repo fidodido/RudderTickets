@@ -66,9 +66,7 @@ $(document).ready(function () {
 
     });
 
-    $('.new-ticket').summernote({
-        height: 100
-    });
+
 
 
 });

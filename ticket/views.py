@@ -18,7 +18,7 @@ def index(request):
 
     tickets = Ticket.objects.filter(
         status__in=[PENDING, WORKING_IN]
-    ).order_by('status', '-high_priority', '-created')
+    ).order_by('-status', '-high_priority', '-created')
     
     template = 'ticket/index.html'
     return render(request, template, { 'tickets' : tickets})
@@ -88,8 +88,23 @@ def add(request):
             reply.comment = request.POST.get('description')
             reply.save()
 
+            # ademas se debe procesar los archivos subidos.
+            filenames = request.POST.getlist('filename')
+            filehashes = request.POST.getlist('filehash')
+
+            print filehashes
+
+            i = 0
+            for myfile in filenames:
+                attachment = Attachment()
+                attachment.reply = reply
+                attachment.name = myfile
+                attachment.hash = filehashes[i]
+                attachment.save()
+                i = i + 1
+
             messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
-            return redirect('tickets_index')
+            return redirect('tickets_view', new_ticket.slug)
         else:
             return render(request, template, {'form': form})
 
@@ -146,8 +161,6 @@ def comment(request, ticket_slug):
         if form.is_valid():
 
             new_reply = form.save()
-
-            print request.POST.getlist('filename')
 
             filenames = request.POST.getlist('filename')
             filehashes = request.POST.getlist('filehash')
@@ -221,30 +234,13 @@ def assign_to(request, ticket_slug):
 @login_required
 def cancel(request, ticket_slug):
 
-    template = 'ticket/cancel.html'
+    #template = 'ticket/cancel.html'
     ticket = Ticket.objects.get(slug=ticket_slug)
     action = Action.objects.get(current_status=ticket.status, post_status=CANCELED)
-
-    form = CancelForm(initial={
-        'ticket': ticket,
-        'current_status': ticket.status,
-        'post_status': action.post_status,
-        'user': request.user
-    })
-
-    if request.method == 'POST':
-
-        form = CancelForm(request.POST)
-
-        if form.is_valid():
-            new_workflow = form.save()
-            ticket.status = new_workflow.post_status
-            ticket.assigned_to = new_workflow.user
-            ticket.save()
-            messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
-            return redirect('tickets_view', ticket.slug)
-    
-    return render(request, template, {'form': form, 'action': action, 'ticket': ticket})
+    ticket.status = action.post_status
+    ticket.save()
+    messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
+    return redirect('tickets_view', ticket.slug)
 
 
 @login_required
@@ -253,27 +249,11 @@ def re_open(request, ticket_slug):
     template = 'ticket/re-open.html'
     ticket = Ticket.objects.get(slug=ticket_slug)
     action = Action.objects.get(current_status=ticket.status, post_status=PENDING)
+    ticket.status = action.post_status
+    ticket.save()
+    messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
+    return redirect('tickets_view', ticket.slug)
 
-    form = ReopenForm(initial={
-        'ticket': ticket,
-        'current_status': ticket.status,
-        'post_status': action.post_status,
-        'user': request.user
-    })
-
-    if request.method == 'POST':
-
-        form = ReopenForm(request.POST)
-
-        if form.is_valid():
-            new_workflow = form.save()
-            ticket.status = new_workflow.post_status
-            ticket.assigned_to = None
-            ticket.save()
-            messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
-            return redirect('tickets_view', ticket.slug)
-    
-    return render(request, template, {'form': form, 'action': action, 'ticket': ticket})
 
 @login_required
 def solve(request, ticket_slug):
@@ -281,29 +261,10 @@ def solve(request, ticket_slug):
     template = 'ticket/solve.html'
     ticket = Ticket.objects.get(slug=ticket_slug)
     action = Action.objects.get(current_status=ticket.status, post_status=RESOLVED)
-
-    form = SolveForm(initial={
-        'ticket': ticket,
-        'current_status': ticket.status,
-        'post_status': action.post_status,
-        'user': request.user
-    })
-
-    if request.method == 'POST':
-
-        form = SolveForm(request.POST)
-
-        if form.is_valid():
-            new_workflow = form.save()
-            ticket.status = new_workflow.post_status
-            ticket.assigned_to = new_workflow.user
-            ticket.resolution = new_workflow.comment
-            ticket.save()
-            messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
-            return redirect('tickets_view', ticket.slug)
-    
-    return render(request, template, {'form': form, 'action': action, 'ticket': ticket})
-
+    ticket.status = action.post_status
+    ticket.save()
+    messages.add_message(request, messages.SUCCESS, 'Your data has been successfully saved')
+    return redirect('tickets_view', ticket.slug)
 
 
 @login_required
