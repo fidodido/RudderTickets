@@ -9,14 +9,9 @@ urlpatterns = [
 		name='tickets_index'
 	),
 
-	url(r'^resolved$',
-		views.resolved,
-		name='tickets_resolved'
-	),
-
-	url(r'^canceled$',
-		views.canceled,
-		name='tickets_canceled'
+	url(r'^list/$',
+		views.list,
+		name='tickets_list'
 	),
 
 	url(r'^view/(?P<ticket_slug>[a-zA-Z0-9-]+)/$',

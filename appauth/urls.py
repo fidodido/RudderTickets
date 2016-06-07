@@ -13,5 +13,10 @@ urlpatterns = [
 	url(r'^logout/$',
 		views.signout,
 		name='signout'
+	),
+	
+	url(r'^users/profile/(?P<user_id>[a-zA-Z0-9-]+)/$',
+		views.user_profile,
+		name='user_profile'
 	)
 ]

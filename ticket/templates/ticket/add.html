@@ -54,6 +54,17 @@
         <div class="panel-body demo-panel-files" id='demo-files'></div>
     </div>
 
+    <span class="generic-error">{{ form.project.errors.as_text }}</span>
+
+    {% if memberships %}
+    <div class="form-group">
+        <label for="inputEmail3" class="col-sm-2 control-label">Project</label>
+        <div class="col-sm-5">
+            {{ form.project }}
+        </div>
+        <span class="generic-error">{{ form.project.errors.as_text }}</span>
+    </div>
+    {% endif %}
 
     <hr>
 

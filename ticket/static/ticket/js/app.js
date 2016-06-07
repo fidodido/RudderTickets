@@ -2,6 +2,8 @@ $(document).ready(function () {
 
     console.log('Iniciando app ....');
 
+
+
     function getCookie(c_name) {
         if (document.cookie.length > 0)
         {

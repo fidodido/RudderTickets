@@ -1,24 +1,59 @@
 {% extends "ticket/layout.html" %} {% block content %} {% load staticfiles i18n %} {% load humanize %}
 
-    <div class="tickets-container">
-        <div class="row ticket-row">
-            <div class="col-md-2"><strong>Status</strong></div>
-            <div class="col-md-4"><strong>Summary</strong></div>
-            <div class="col-md-2"><strong>Type</strong></div>
-            <div class="col-md-2"><strong>Asignado a</strong></div>
-            <div class="col-md-2"><strong>Created</strong></div>
+    <ul class="nav nav-tabs tabs-up" id="friends">
+        <li><a href="/tickets/list/?status=active" data-target="#tab_active" class="media_node span" id="active" data-toggle="tabajax" rel="tooltip"> Active ({{ count_active }})</a></li>
+        <li><a href="/tickets/list/?status=solved" data-target="#tab_solved" class="media_node span" id="solved" data-toggle="tabajax" rel="tooltip"> Resolved ({{ count_resolved }})</a></li>
+        <li><a href="/tickets/list/?status=canceled" data-target="#tab_canceled" class="media_node span" id="canceled" data-toggle="tabajax" rel="tooltip">Canceled ({{ count_canceled }})</a></li>
+    </ul>
+
+    <div class="tab-content" style="padding: 10px">
+        <div class="tab-pane active" id="tab_active">
         </div>
-        {% for t in tickets %}
-            <div class="row ticket-row">
-                <div class="col-md-2"><span class="label-block label label-{{ t.status.label_class }}">{{ t.status.name }}</span></div>
-                <div class="col-md-4">
-                    <a href="/tickets/view/{{ t.slug }}/">TICKET-{{ t.id }}</a><br>
-                    {{ t.name }}
-                </div>
-                <div class="col-md-2"><i style="color: {{ t.type.color }}" class="{{ t.type.icon }}" aria-hidden="true"></i></div>
-                <div class="col-md-2">{{ t.created_by.first_name }} {{ t.created_by.last_name }}</div>
-                <div class="col-md-2">{{ t.created|naturaltime }}</div>
-            </div>
-        {% endfor %}
+        <div class="tab-pane" id="tab_solved">
+        </div>
+        <div class="tab-pane  urlbox span8" id="tab_canceled">
+        </div>
     </div>
+
+<script type="text/javascript">
+
+
+$(document).ready(function() {
+
+
+    if(window.location.hash == "") {
+        console.log(window.location.hash);
+        window.location.hash = "list-active";
+    }
+
+    var hash = window.location.hash;
+
+    $('.media_node').click(function(e) {
+        changeTab(this, e);
+    });
+
+    $('.nav-tabs a:first').tab('show').trigger('click');
+
+    function changeTab(el, e) {
+
+        e.preventDefault();
+
+        var $el = $(el),
+            loadurl = $el.attr('href'),
+            tabId = $el.attr('id'),
+            targ = $el.attr('data-target');
+
+        window.location.hash = 'list-' + tabId;
+
+        $.get(loadurl, function(data) {
+            $(targ).html(data);
+        });
+
+        $el.tab('show');
+        return false;
+    }
+
+});
+</script>
+
 {% endblock %}

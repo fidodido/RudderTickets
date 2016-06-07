@@ -6,11 +6,6 @@
 
 <form class="form-horizontal" role="form" method="post">
 
-    <div class="action-bar clearfix">
-        <div class="pull-left">
-            <a href="/tickets/" class="btn btn-default"><i class="fa fa-chevron-left" aria-hidden="true"></i> Back</a>
-        </div>
-    </div>
 
     {% csrf_token %}
 
@@ -48,7 +43,8 @@
         </div>
     </div>
 
-    <button class="btn btn-primary">CREATE</button>
+    <button class="btn btn-danger">SAVE</button>
+    <button type="button" onclick="window.history.back()" class="btn btn-default"><i class="fa fa-chevron-left" aria-hidden="true"></i> Back</button>
 
 
 </form>

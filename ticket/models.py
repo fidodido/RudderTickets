@@ -15,6 +15,17 @@ class Project(models.Model):
 		return self.name
 
 
+class Membership(models.Model):
+
+    user = models.ForeignKey(User)
+    project = models.ForeignKey(Project)
+    
+    def __unicode__(self):
+        return self.project.name
+
+    class Meta:
+        unique_together = ('user', 'project',)
+
 class Type(models.Model):
 	name = models.CharField(max_length=255, unique=True)
 	icon = models.CharField(default='', max_length=255)
@@ -46,6 +57,7 @@ class Ticket(models.Model):
 	assigned_to = models.ForeignKey(User, null=True, related_name='assigned_to')
 	high_priority = models.BooleanField(default=0)
 	user_detail = models.ManyToManyField(User, through='UserDetail')
+	project = models.ForeignKey(Project, null=True, blank=True)
 
 	def is_priority(self):
 		return True if self.high_priority else False

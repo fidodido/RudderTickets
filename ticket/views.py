@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, permission_required
 from ticket.forms import TicketForm, AssignToForm, CancelForm, SolveForm, ReplyForm, ReopenForm
 from django.contrib import messages
-from ticket.models import Ticket, Action, Status, Workflow, Reply, UserDetail, Attachment
+from ticket.models import Ticket, Action, Status, Workflow, Reply, UserDetail, Attachment, Membership
 import pprint
 from django.http import HttpResponse, JsonResponse
 import os
@@ -16,29 +16,42 @@ RESOLVED = 4
 @login_required
 def index(request):
 
+    count_active = Ticket.objects.filter(status__in=[PENDING, WORKING_IN]).count()
+    count_resolved = Ticket.objects.filter(status__in=[RESOLVED]).count()
+    count_canceled = Ticket.objects.filter(status__in=[CANCELED]).count()
+
     tickets = Ticket.objects.filter(
         status__in=[PENDING, WORKING_IN]
     ).order_by('-status', '-high_priority', '-created')
     
     template = 'ticket/index.html'
-    return render(request, template, { 'tickets' : tickets})
-
-
-@login_required
-def resolved(request):
-
-    tickets = Ticket.objects.filter(status=RESOLVED).order_by('status', '-high_priority', '-created')
-    template = 'ticket/index.html'
-    return render(request, template, { 'tickets' : tickets})
+    return render(request, template, { 'tickets' : tickets, 'count_active': count_active, 'count_resolved': count_resolved, 'count_canceled': count_canceled})
 
 
 
 @login_required
-def canceled(request):
+def list(request):
 
-    tickets = Ticket.objects.filter(status=CANCELED).order_by('status', '-high_priority', '-created')
-    template = 'ticket/index.html'
-    return render(request, template, { 'tickets' : tickets})
+    query = request.GET.get('status')
+
+    memberships = Membership.objects.filter(
+        user=request.user
+    )
+
+    if query == 'active':
+        status_list = [PENDING, WORKING_IN]
+    elif query == 'solved':
+        status_list = [RESOLVED]
+    elif query == 'canceled':
+        status_list = [CANCELED]
+
+    tickets = Ticket.objects.filter(
+        status__in=status_list
+    ).order_by('-status', '-high_priority', '-created')
+    
+    template = 'ticket/list.html'
+    return render(request, template, { 'tickets' : tickets, 'memberships': memberships})
+
 
 
 @login_required
@@ -72,7 +85,13 @@ def add(request):
 
     template = 'ticket/add.html'
     form = TicketForm()
-    
+
+    memberships = Membership.objects.filter(
+        user=request.user
+    )
+
+    print memberships
+
     if request.method == 'POST':
 
         form = TicketForm(request.POST)
@@ -108,7 +127,7 @@ def add(request):
         else:
             return render(request, template, {'form': form})
 
-    return render(request, template, {'form': form})
+    return render(request, template, {'form': form, 'memberships': memberships})
 
 
 @login_required

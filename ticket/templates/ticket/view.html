@@ -10,18 +10,20 @@
         <div class="action-bar clearfix">
             <div class="pull-left">
                 <a href="/tickets/" type="button" class="btn btn-default"><i class="fa fa-chevron-left" aria-hidden="true"></i> Back</a>
-            </div>
-            <div class="pull-right">
                 {% for action in actions %}
                 <a href="/tickets/view/{{ ticket.slug }}/action/{{ action.slug }}" class="btn answer-container">{{ action.name }}</a> {% endfor %}
+            </div>
+            <div class="pull-right">
                 <a class="btn btn-default" href="/tickets/edit/{{ ticket.slug }}/">Edit</a>
+                <a href="/tickets/add/" type="button" class="btn btn-success">Create New Ticket</a>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-9">
 
-                <h4>{{ ticket.name }} (<i style="color: {{ ticket.type.color }}" class="{{ ticket.type.icon }}" aria-hidden="true"></i> {{ ticket.type.name }})</h4>
+                <h3>{{ ticket.name }} (<i style="color: {{ ticket.type.color }}" class="{{ ticket.type.icon }}" aria-hidden="true"></i> {{ ticket.type.name }})</h3>
+                <span style="font-size: 15px; margin-right: 10px" class="label-block label label-{{ ticket.status.label_class }}">{{ ticket.status.name }}</span><span style="color: #767676">#{{ ticket.id }} opened {{ ticket.created|naturaltime }} by {{ ticket.created_by.first_name }} {{ ticket.created_by.last_name }}</span>
                 <hr>
 
                 <div class="comments-container">
@@ -73,45 +75,54 @@
                 </div>
                 <div class="container-reply">
 
-                    <form method="POST" action="/tickets/view/{{ ticket.slug }}/comment">
+                    <div class="row">
+                        <div class="col-md-1">
+                            <img class="media-object" data-src="holder.js/64x64" alt="64x64" src="{% static "ticket/avatars/avatar4.png" %}" data-holder-rendered="true" style="width: 32px; height: 32px;">
+                        </div>
+                        <div class="col-md-11">
+                            <form method="POST" action="/tickets/view/{{ ticket.slug }}/comment">
 
-                        {% csrf_token %}
-                        {{ replyForm.ticket }}
-                        {{ replyForm.user }}
+                                {% csrf_token %}
+                                {{ replyForm.ticket }}
+                                {{ replyForm.user }}
 
-                        <div id="hidden-files"></div>
+                                <div id="hidden-files"></div>
 
-                        <div class="panel panel-default">
+                                <div class="panel panel-default">
 
-                            <div class="panel-body" style="padding: 0px;">
-                                <textarea id="summernote" style="display: none" name="comment" class="summernote"></textarea>
-                            </div>
-
-                            <div class="">
-                                <div class="panel-body demo-panel-files" id='demo-files'></div>
-                            </div>
-
-                            <div class="panel-footer">
-
-                                <div class="clearfix">
-
-                                    <button style="float:left" class="btn btn-primary">Reply</button>
-                                    
-                                    <div id="drag-and-drop-zone" class="uploader">
-                                        <div class="browser">
-                                            <label class="btn btn-default">
-                                                <span>ADD FILE</span>
-                                                <input id="my-files" type="file" name="files[]" multiple="multiple" title='Click to add Files'>
-                                            </label>
-                                        </div>
+                                    <div class="panel-body" style="padding: 0px;">
+                                        <textarea id="summernote" style="display: none" name="comment" class="summernote"></textarea>
                                     </div>
-                                    
+
+                                    <div class="">
+                                        <div class="panel-body demo-panel-files" id='demo-files'></div>
+                                    </div>
+
+                                    <div class="panel-footer">
+
+                                        <div class="clearfix">
+
+                                            <button style="float:left" class="btn btn-primary">Reply</button>
+                                            
+                                            <div id="drag-and-drop-zone" class="uploader">
+                                                <div class="browser">
+                                                    <label class="btn btn-default">
+                                                        <span>ADD FILE</span>
+                                                        <input id="my-files" type="file" name="files[]" multiple="multiple" title='Click to add Files'>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+
+                                    </div>
                                 </div>
 
-                            </div>
+                            </form>
                         </div>
+                    </div>
 
-                    </form>
+
                 </div>
             </div>
             <div class="col-md-3">
@@ -121,12 +132,6 @@
                     </div>
                     <div class="panel-body">
                         <table class="table table-condensed">
-                            <tr>
-                                <th>Status</th>
-                            </tr>
-                            <tr>
-                                <td><span class="label-block label label-{{ ticket.status.label_class }}">{{ ticket.status.name }}</span></td>
-                            </tr>
                             <tr>
                                 <th>Created</th>
                             </tr>

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from appauth.forms import AuthForm
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect
+from django.contrib.auth.models import User
 
 #this errors must be in global config
 ERR_NOT_VALID = 'Sorry, Not valid account'
@@ -58,3 +59,13 @@ def signin(request):
 def signout(request):
     logout(request)
     return redirect(LOGOUT_REDIRECT)
+
+
+#@login_required
+def user_profile(request, user_id):
+
+    template = 'appauth/user_profile.html'
+
+    user = User.objects.get(pk=user_id)
+
+    return render(request, template, {'user': user})

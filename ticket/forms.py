@@ -8,11 +8,12 @@ class TicketForm(ModelForm):
 
     class Meta:
         model = Ticket
-        fields = ['name', 'description', 'type', 'high_priority']
+        fields = ['name', 'description', 'type', 'high_priority', 'project']
         widgets = {
             'name': forms.TextInput(attrs={'id': 'project-name', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control new-ticket', 'rows': 4}),
-            'type': forms.Select(attrs={'class': 'form-control'})
+            'type': forms.Select(attrs={'class': 'form-control'}),
+            'project': forms.Select(attrs={'class': 'form-control'})
         }
 
     def save(self):

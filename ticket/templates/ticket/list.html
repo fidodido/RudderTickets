@@ -1,0 +1,68 @@
+{% load humanize %}
+
+<div class="filter-container" style="margin-bottom: 10px;">
+    <div class="row">
+        <div class="col-md-4">
+            <select class="form-control">
+                {% for mem in memberships %}
+                <option>{{ mem.project.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <div class="input-group">
+                <input type="search" name="searchBy" id="searchBy" class="form-control" />
+                <span class="input-group-btn">
+                    <button id="filter" class="btn btn-primary btn-block" onclick="searchStationTable();">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <a href="/tickets/add/" type="button" class="btn btn-success">Create New Ticket</a>
+        </div>
+    </div>
+</div>
+
+<div class="tickets-container">
+    <div class="row ticket-row ticket-row-heading">
+        <div class="col-md-6"><strong>Summary</strong></div>
+        <div class="col-md-1"><strong>Type</strong></div>
+        <div class="col-md-1"><strong>Project</strong></div>
+        <div class="col-md-2"><strong>Asignado a</strong></div>
+        <div class="col-md-2"><strong>Status</strong></div>
+    </div>
+    {% for t in tickets %}
+        <div class="row ticket-row">
+            <div class="col-md-6">
+                <a href="/tickets/view/{{ t.slug }}/">{{ t.name }}</a><br>
+                <span style="color: #767676">#{{ t.id }} opened {{ t.created|naturaltime }} by <a href="/users/profile/{{ request.user.id }}">{{ t.created_by.first_name }} {{ t.created_by.last_name }}</a></span>
+            </div>
+            <div class="col-md-1"><i style="color: {{ t.type.color }}" class="{{ t.type.icon }}" aria-hidden="true"></i></div>
+            <div class="col-md-1">{% if t.project %} {{ t.project.name }} {% else %} -- {% endif %}</div>
+            <div class="col-md-2">{% if t.assigned_to %} <a href="">{{ t.assigned_to.first_name }} {{ t.assigned_to.last_name }}</a> {% else %} -- {% endif %}</div>
+            <div class="col-md-2"><span style="margin-right: 10px" class="label-block label label-{{ t.status.label_class }}">{{ t.status.name }}</span></div>
+        </div>
+    {% endfor %}
+</div>
+
+<nav>
+  <ul class="pagination">
+    <li>
+      <a href="#" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    <li><a href="#">1</a></li>
+    <li><a href="#">2</a></li>
+    <li><a href="#">3</a></li>
+    <li><a href="#">4</a></li>
+    <li><a href="#">5</a></li>
+    <li>
+      <a href="#" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
